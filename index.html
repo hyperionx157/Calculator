@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calculator</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -9,13 +11,21 @@
 <div class="calculator">
   <div class="top-bar">TI-84 Plus</div>
   <input type="text" id="display" disabled>
-
   <div class="buttons" id="buttons"></div>
 </div>
 
 <div id="hub" class="hidden">
-  <h2>Game Hub</h2>
-  <ul id="repoList"></ul>
+  <div class="hub-header">
+    <h2>Game Hub</h2>
+    <p>Select a game to play</p>
+  </div>
+  <div id="hubContent">
+    <div class="hub-loading" id="hubLoading">
+      <div class="spinner"></div>
+      <span>Loading games...</span>
+    </div>
+  </div>
+  <ul id="repoList" class="game-grid"></ul>
 </div>
 
 <script src="script.js"></script>
