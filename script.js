@@ -11,12 +11,48 @@ const buttons = [
   "C","←" // ← is backspace
 ];
 
-buttons.forEach(btn => {
+const operators = ["/", "*", "-", "+"];
+
+buttons.forEach((btn, i) => {
   const button = document.createElement("button");
   button.textContent = btn;
-  button.onclick = () => handleInput(btn);
+  button.onclick = (e) => {
+    createRipple(e, button);
+    handleInput(btn);
+  };
+
+  // Apply style classes
+  if (operators.includes(btn)) {
+    button.classList.add("operator");
+  } else if (btn === "=") {
+    button.classList.add("equals");
+  } else if (btn === "C" || btn === "←") {
+    button.classList.add("action");
+  }
+
+  // C button spans 2 columns
+  if (btn === "C") {
+    button.classList.add("wide");
+  }
+
+  // Staggered entrance animation
+  button.style.animationDelay = `${0.3 + i * 0.03}s`;
+
   buttonsContainer.appendChild(button);
 });
+
+// Ripple effect on button press
+function createRipple(event, button) {
+  const ripple = document.createElement("span");
+  ripple.classList.add("ripple");
+  const rect = button.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  ripple.style.width = ripple.style.height = size + "px";
+  ripple.style.left = (event.clientX - rect.left - size / 2) + "px";
+  ripple.style.top = (event.clientY - rect.top - size / 2) + "px";
+  button.appendChild(ripple);
+  ripple.addEventListener("animationend", () => ripple.remove());
+}
 
 function handleInput(value) {
   if (value === "=") {
@@ -25,6 +61,9 @@ function handleInput(value) {
     } catch {
       input = "";
     }
+    // Flash display on result
+    display.classList.add("active");
+    setTimeout(() => display.classList.remove("active"), 300);
   } else if (value === "C") {
     input = "";
   } else if (value === "←") { // backspace
@@ -45,9 +84,13 @@ function checkUnlock() {
 }
 
 function unlockHub() {
-  document.querySelector(".calculator").style.display = "none";
-  document.getElementById("hub").classList.remove("hidden");
-  fetchRepos();
+  const calc = document.querySelector(".calculator");
+  calc.classList.add("fade-out");
+  setTimeout(() => {
+    calc.style.display = "none";
+    document.getElementById("hub").classList.remove("hidden");
+    fetchRepos();
+  }, 400);
 }
 
 // Key combo unlock: Shift + J
@@ -64,33 +107,82 @@ document.addEventListener("keydown", function(e){
   }
 });
 
+// Game icons to pick from for visual variety
+const gameIcons = ["🎮", "🕹️", "🎯", "🎲", "🏆", "⚡", "🔥", "💎", "🚀", "🌟", "🎪", "🃏"];
+
+// Format repo name into a readable title
+function formatName(name) {
+  return name
+    .replace(/[-_]/g, " ")
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
 // Fetch all GitHub Pages repos
 async function fetchRepos() {
   const username = "hyperionx157"; // change this
   let page = 1;
   let repos = [];
 
-  while (true) {
-    const response = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&page=${page}`);
-    const data = await response.json();
-    if (data.length === 0) break;
-    repos = repos.concat(data);
-    page++;
+  try {
+    while (true) {
+      const response = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&page=${page}`);
+      const data = await response.json();
+      if (data.length === 0) break;
+      repos = repos.concat(data);
+      page++;
+    }
+  } catch {
+    // Silently handle network errors
   }
+
+  // Hide loading spinner
+  const loading = document.getElementById("hubLoading");
+  if (loading) loading.style.display = "none";
 
   const list = document.getElementById("repoList");
   list.innerHTML = "";
 
-  repos.forEach(repo => {
-    if (repo.has_pages) { // only repos with GitHub Pages
-      const li = document.createElement("li");
-      const link = document.createElement("a");
-      link.href = `https://${username}.github.io/${repo.name}`;
-      link.textContent = repo.name;
-      link.target = "_blank";
-      link.style.color = "#00ff88";
-      li.appendChild(link);
-      list.appendChild(li);
-    }
+  const pagesRepos = repos.filter(repo => repo.has_pages);
+
+  if (pagesRepos.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "hub-empty";
+    empty.textContent = "No games found.";
+    document.getElementById("hubContent").appendChild(empty);
+    return;
+  }
+
+  pagesRepos.forEach((repo, index) => {
+    const li = document.createElement("li");
+    li.className = "game-card";
+    li.style.animationDelay = `${0.6 + index * 0.06}s`;
+
+    const link = document.createElement("a");
+    link.href = `https://${username}.github.io/${repo.name}`;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+
+    const icon = document.createElement("div");
+    icon.className = "card-icon";
+    icon.textContent = gameIcons[index % gameIcons.length];
+
+    const name = document.createElement("div");
+    name.className = "card-name";
+    name.textContent = formatName(repo.name);
+
+    const url = document.createElement("div");
+    url.className = "card-url";
+    url.textContent = `${username}.github.io/${repo.name}`;
+
+    const arrow = document.createElement("span");
+    arrow.className = "card-arrow";
+    arrow.textContent = "→";
+
+    link.appendChild(icon);
+    link.appendChild(name);
+    link.appendChild(url);
+    link.appendChild(arrow);
+    li.appendChild(link);
+    list.appendChild(li);
   });
 }
