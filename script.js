@@ -107,8 +107,18 @@ document.addEventListener("keydown", function(e){
   }
 });
 
-// Game icons to pick from for visual variety
+// Game icons to pick from for visual variety (fallback when no image is set)
 const gameIcons = ["🎮", "🕹️", "🎯", "🎲", "🏆", "⚡", "🔥", "💎", "🚀", "🌟", "🎪", "🃏"];
+
+// ─── CUSTOM GAME IMAGES ────────────────────────────────
+// Map repo names to image URLs to show a picture instead of an emoji.
+// Just add entries like:  "repo-name": "https://example.com/image.png"
+// Supports any image URL (png, jpg, gif, svg, webp).
+// Repos not listed here will use a fallback emoji icon.
+const gameImages = {
+  // "my-cool-game": "images/cool-game.png",
+  // "snake":        "https://i.imgur.com/abc123.png",
+};
 
 // Format repo name into a readable title
 function formatName(name) {
@@ -164,7 +174,19 @@ async function fetchRepos() {
 
     const icon = document.createElement("div");
     icon.className = "card-icon";
-    icon.textContent = gameIcons[index % gameIcons.length];
+
+    // Use custom image if one is configured, otherwise fall back to emoji
+    if (gameImages[repo.name]) {
+      const img = document.createElement("img");
+      img.src = gameImages[repo.name];
+      img.alt = formatName(repo.name);
+      img.className = "card-img";
+      img.draggable = false;
+      icon.appendChild(img);
+      icon.classList.add("has-img");
+    } else {
+      icon.textContent = gameIcons[index % gameIcons.length];
+    }
 
     const name = document.createElement("div");
     name.className = "card-name";
