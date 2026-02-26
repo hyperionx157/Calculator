@@ -168,6 +168,7 @@ const externalGames = [
 ];
 
 console.log("External games array loaded:", externalGames.length, "games");
+console.log("Last deployment:", new Date().toISOString());
 
 // Opens a URL inside a full-screen iframe in a new about:blank tab
 function openInBlank(url, title) {
