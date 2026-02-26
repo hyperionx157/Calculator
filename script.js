@@ -159,7 +159,8 @@ const iframeGames = {
 //
 // Just uncomment and add as many as you want:
 const externalGames = [
-  { name: "Slope", url: "https://slope-game.github.io", image: "https://i.imgur.com/J3K3tQe.png" },
+  { name: "Slope", url: "https://slope-game.github.io/slope", image: "https://i.imgur.com/3QF6vY9.png" },
+  { name: "Test Game", url: "https://google.com" }, // Simple test without image
   // { name: "1v1.LOL",        url: "https://example.com/1v1",          image: "https://i.imgur.com/xyz.png" },
   // { name: "Retro Bowl",     url: "https://example.com/retro-bowl" },
   // { name: "Subway Surfers", url: "https://example.com/subway" },
