@@ -144,6 +144,22 @@ const iframeGames = {
   // "my-cool-game": "https://example.com/play",
 };
 
+// ─── EXTERNAL GAMES ────────────────────────────────────
+// Add any external site / game here. These show up as cards in the hub
+// and always open inside an about:blank iframe tab.
+//
+//   name:  Display name shown on the card
+//   url:   The actual game URL (loaded in a hidden iframe)
+//   image: (optional) image URL for the card icon — omit to use a fallback emoji
+//
+// Just uncomment and add as many as you want:
+const externalGames = [
+  // { name: "Slope",          url: "https://example.com/slope",        image: "images/slope.png" },
+  // { name: "1v1.LOL",        url: "https://example.com/1v1",          image: "https://i.imgur.com/xyz.png" },
+  // { name: "Retro Bowl",     url: "https://example.com/retro-bowl" },
+  // { name: "Subway Surfers", url: "https://example.com/subway" },
+];
+
 // Opens a URL inside a full-screen iframe in a new about:blank tab
 function openInBlank(url, title) {
   const win = window.open("about:blank", "_blank");
@@ -193,9 +209,60 @@ async function fetchRepos() {
   const list = document.getElementById("repoList");
   list.innerHTML = "";
 
+  let cardIndex = 0;
+
+  // ── Render external games first ──────────────────────
+  externalGames.forEach((game) => {
+    const li = document.createElement("li");
+    li.className = "game-card";
+    li.style.animationDelay = `${0.6 + cardIndex * 0.06}s`;
+
+    const link = document.createElement("a");
+    link.href = "#";
+    link.addEventListener("click", function(e) {
+      e.preventDefault();
+      openInBlank(game.url, game.name);
+    });
+
+    const icon = document.createElement("div");
+    icon.className = "card-icon";
+    if (game.image) {
+      const img = document.createElement("img");
+      img.src = game.image;
+      img.alt = game.name;
+      img.className = "card-img";
+      img.draggable = false;
+      icon.appendChild(img);
+      icon.classList.add("has-img");
+    } else {
+      icon.textContent = gameIcons[cardIndex % gameIcons.length];
+    }
+
+    const name = document.createElement("div");
+    name.className = "card-name";
+    name.textContent = game.name;
+
+    const url = document.createElement("div");
+    url.className = "card-url";
+    url.textContent = "opens in about:blank";
+
+    const arrow = document.createElement("span");
+    arrow.className = "card-arrow";
+    arrow.textContent = "→";
+
+    link.appendChild(icon);
+    link.appendChild(name);
+    link.appendChild(url);
+    link.appendChild(arrow);
+    li.appendChild(link);
+    list.appendChild(li);
+    cardIndex++;
+  });
+
+  // ── Render GitHub repos ──────────────────────────────
   const pagesRepos = repos.filter(repo => repo.has_pages);
 
-  if (pagesRepos.length === 0) {
+  if (pagesRepos.length === 0 && externalGames.length === 0) {
     const empty = document.createElement("div");
     empty.className = "hub-empty";
     empty.textContent = "No games found.";
@@ -203,10 +270,10 @@ async function fetchRepos() {
     return;
   }
 
-  pagesRepos.forEach((repo, index) => {
+  pagesRepos.forEach((repo) => {
     const li = document.createElement("li");
     li.className = "game-card";
-    li.style.animationDelay = `${0.6 + index * 0.06}s`;
+    li.style.animationDelay = `${0.6 + cardIndex * 0.06}s`;
 
     const gameUrl = `https://${username}.github.io/${repo.name}`;
     const link = document.createElement("a");
@@ -238,7 +305,7 @@ async function fetchRepos() {
       icon.appendChild(img);
       icon.classList.add("has-img");
     } else {
-      icon.textContent = gameIcons[index % gameIcons.length];
+      icon.textContent = gameIcons[cardIndex % gameIcons.length];
     }
 
     const name = document.createElement("div");
@@ -259,5 +326,6 @@ async function fetchRepos() {
     link.appendChild(arrow);
     li.appendChild(link);
     list.appendChild(li);
+    cardIndex++;
   });
 }
