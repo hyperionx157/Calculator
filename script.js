@@ -3,11 +3,12 @@
 // Change this to whatever you want people to see if they glance at your screen.
 const FAKE_TITLE = "Scientific Calculator - Math Tools";
 document.title = FAKE_TITLE;
-try {
-  history.replaceState(null, "", "/Calculator/");
-} catch (e) {
-  // replaceState can fail on file:// or restricted origins — ignore silently
-}
+// URL scramble disabled to prevent 404 errors
+// try {
+//   history.replaceState(null, "", "/Calculator/");
+// } catch (e) {
+//   // replaceState can fail on file:// or restricted origins — ignore silently
+// }
 
 let input = "";
 const display = document.getElementById("display");
