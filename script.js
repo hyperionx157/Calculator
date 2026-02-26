@@ -128,6 +128,39 @@ const gameImages = {
   // "snake":        "https://i.imgur.com/abc123.png",
 };
 
+// ─── IFRAME GAMES (about:blank) ────────────────────────
+// Any repo name listed here will open in a new about:blank tab with a
+// full-screen iframe instead of navigating directly.  The URL bar in
+// that tab will just say "about:blank" so nobody can see the real site.
+//
+// Set the value to true to auto-build the GitHub Pages URL,
+// or set it to a custom URL string to load something else entirely.
+//
+// Examples:
+//   "snake": true,                          // → opens https://<user>.github.io/snake in iframe
+//   "my-game": "https://example.com/game",  // → opens that custom URL in iframe
+const iframeGames = {
+  // "snake": true,
+  // "my-cool-game": "https://example.com/play",
+};
+
+// Opens a URL inside a full-screen iframe in a new about:blank tab
+function openInBlank(url, title) {
+  const win = window.open("about:blank", "_blank");
+  if (!win) return; // popup blocked
+  win.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <title>${title}</title>
+  <style>*{margin:0;padding:0}html,body{height:100%;overflow:hidden}iframe{width:100%;height:100%;border:none}</style>
+</head>
+<body>
+  <iframe src="${url}" allowfullscreen></iframe>
+</body>
+</html>`);
+  win.document.close();
+}
+
 // Format repo name into a readable title
 function formatName(name) {
   return name
@@ -175,10 +208,22 @@ async function fetchRepos() {
     li.className = "game-card";
     li.style.animationDelay = `${0.6 + index * 0.06}s`;
 
+    const gameUrl = `https://${username}.github.io/${repo.name}`;
     const link = document.createElement("a");
-    link.href = `https://${username}.github.io/${repo.name}`;
+    link.href = gameUrl;
     link.target = "_blank";
     link.rel = "noopener noreferrer";
+
+    // If this game is in iframeGames, hijack the click to open in about:blank
+    if (repo.name in iframeGames) {
+      link.addEventListener("click", function(e) {
+        e.preventDefault();
+        const iframeUrl = typeof iframeGames[repo.name] === "string"
+          ? iframeGames[repo.name]
+          : gameUrl;
+        openInBlank(iframeUrl, formatName(repo.name));
+      });
+    }
 
     const icon = document.createElement("div");
     icon.className = "card-icon";
