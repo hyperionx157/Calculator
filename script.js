@@ -166,6 +166,8 @@ const externalGames = [
   // { name: "Subway Surfers", url: "https://example.com/subway" },
 ];
 
+console.log("External games array loaded:", externalGames.length, "games");
+
 // Opens a URL inside a full-screen iframe in a new about:blank tab
 function openInBlank(url, title) {
   const win = window.open("about:blank", "_blank");
@@ -218,7 +220,9 @@ async function fetchRepos() {
   let cardIndex = 0;
 
   // ── Render external games first ──────────────────────
+  console.log("External games:", externalGames);
   externalGames.forEach((game) => {
+    console.log("Processing game:", game.name);
     const li = document.createElement("li");
     li.className = "game-card";
     li.style.animationDelay = `${0.6 + cardIndex * 0.06}s`;
