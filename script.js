@@ -1,3 +1,11 @@
+// ─── URL SCRAMBLE ──────────────────────────────────────
+// Replaces the visible URL in the address bar with a fake innocent path.
+// Change this to whatever you want people to see if they glance at your screen.
+const FAKE_URL = "/apps/calculator/scientific";
+const FAKE_TITLE = "Scientific Calculator - Math Tools";
+history.replaceState(null, "", FAKE_URL);
+document.title = FAKE_TITLE;
+
 let input = "";
 const display = document.getElementById("display");
 const buttonsContainer = document.getElementById("buttons");
