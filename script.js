@@ -159,7 +159,7 @@ const iframeGames = {
 //
 // Just uncomment and add as many as you want:
 const externalGames = [
-  { name: "Slope", url: "https://slope-game.github.io/slope", image: "https://i.imgur.com/3QF6vY9.png" },
+  { name: "Slope", url: "https://slope-game.github.io/slope" }, // Remove broken image
   { name: "Test Game", url: "https://google.com" }, // Simple test without image
   // { name: "1v1.LOL",        url: "https://example.com/1v1",          image: "https://i.imgur.com/xyz.png" },
   // { name: "Retro Bowl",     url: "https://example.com/retro-bowl" },
@@ -242,6 +242,11 @@ async function fetchRepos() {
       img.alt = game.name;
       img.className = "card-img";
       img.draggable = false;
+      img.onerror = function() {
+        console.log("Image failed to load for", game.name, "- using emoji fallback");
+        icon.textContent = gameIcons[cardIndex % gameIcons.length];
+        icon.classList.remove("has-img");
+      };
       icon.appendChild(img);
       icon.classList.add("has-img");
     } else {
