@@ -154,7 +154,7 @@ const iframeGames = {
 //
 // Just uncomment and add as many as you want:
 const externalGames = [
-  { name: "1v1.LOL" url: "https://classroom7x.io/game/1v1-lol/", image: "https://wallpapers.com/images/hd/1v1lol-yv2fqjyhxx61wljx.jpg" },
+  { name: "1v1.LOL" url: https://classroom7x.io/game/1v1-lol/, image: https://wallpapers.com/images/hd/1v1lol-yv2fqjyhxx61wljx.jpg },
   // { name: "Slope",          url: "https://example.com/slope",        image: "images/slope.png" },
   // { name: "1v1.LOL",        url: "https://example.com/1v1",          image: "https://i.imgur.com/xyz.png" },
   // { name: "Retro Bowl",     url: "https://example.com/retro-bowl" },
