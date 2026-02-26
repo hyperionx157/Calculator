@@ -46,10 +46,12 @@ buttons.forEach((btn, i) => {
     button.classList.add("wide");
   }
 
-  // Staggered entrance animation
-  button.style.animationDelay = `${0.3 + i * 0.03}s`;
-
   buttonsContainer.appendChild(button);
+
+  // Staggered entrance animation (applied after append so it always fires)
+  requestAnimationFrame(() => {
+    button.style.animation = `btnAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${0.3 + i * 0.03}s both`;
+  });
 });
 
 // Ripple effect on button press
@@ -69,7 +71,7 @@ function handleInput(value) {
   if (value === "=") {
     try {
       input = eval(input).toString();
-    } catch {
+    } catch (e) {
       input = "";
     }
     // Flash display on result
@@ -201,7 +203,7 @@ async function fetchRepos() {
       repos = repos.concat(data);
       page++;
     }
-  } catch {
+  } catch (e) {
     // Silently handle network errors
   }
 
