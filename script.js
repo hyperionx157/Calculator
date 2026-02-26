@@ -4,7 +4,7 @@
 const FAKE_TITLE = "Scientific Calculator - Math Tools";
 document.title = FAKE_TITLE;
 try {
-  history.replaceState(null, "", "/apps/calculator/scientific");
+  history.replaceState(null, "", "/Calculator/");
 } catch (e) {
   // replaceState can fail on file:// or restricted origins — ignore silently
 }
