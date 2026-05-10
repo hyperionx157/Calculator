@@ -1,14 +1,17 @@
+// ─── EXCLUDED REPOSITORIES ──────────────────────────────────
+// Add any GitHub repo names here that you want to hide from the game hub.
+// These will NOT appear in the list, even if they have GitHub Pages enabled.
+const excludedRepos = [
+  "GameSite",        // hides https://hyperionx157.github.io/GameSite/
+  "GameSite-V2"      // hides https://hyperionx157.github.io/GameSite-V2/
+  // Add more repo names as needed, e.g., "my-private-repo", "test-game"
+];
+
 // ─── URL SCRAMBLE ──────────────────────────────────────
 // Replaces the visible URL in the address bar with a fake innocent path.
 // Change this to whatever you want people to see if they glance at your screen.
 const FAKE_TITLE = "Scientific Calculator - Math Tools";
 document.title = FAKE_TITLE;
-// URL scramble disabled to prevent 404 errors
-// try {
-//   history.replaceState(null, "", "/Calculator/");
-// } catch (e) {
-//   // replaceState can fail on file:// or restricted origins — ignore silently
-// }
 
 let input = "";
 const display = document.getElementById("display");
@@ -49,7 +52,7 @@ buttons.forEach((btn, i) => {
 
   buttonsContainer.appendChild(button);
 
-  // Staggered entrance animation (applied after append so it always fires)
+  // Staggered entrance animation
   requestAnimationFrame(() => {
     button.style.animation = `btnAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${0.3 + i * 0.03}s both`;
   });
@@ -80,7 +83,7 @@ function handleInput(value) {
     setTimeout(() => display.classList.remove("active"), 300);
   } else if (value === "C") {
     input = "";
-  } else if (value === "←") { // backspace
+  } else if (value === "←") {
     input = input.slice(0, -1);
   } else {
     input += value;
@@ -90,7 +93,7 @@ function handleInput(value) {
   checkUnlock();
 }
 
-// Only 2 unlock methods
+// Unlock methods: type "1987" or press Shift+J
 function checkUnlock() {
   if (input === "1987") {
     unlockHub();
@@ -121,59 +124,32 @@ document.addEventListener("keydown", function(e){
   }
 });
 
-// Game icons to pick from for visual variety (fallback when no image is set)
+// Game icons to pick from for visual variety
 const gameIcons = ["🎮", "🕹️", "🎯", "🎲", "🏆", "⚡", "🔥", "💎", "🚀", "🌟", "🎪", "🃏"];
 
 // ─── CUSTOM GAME IMAGES ────────────────────────────────
 // Map repo names to image URLs to show a picture instead of an emoji.
-// Just add entries like:  "repo-name": "https://example.com/image.png"
-// Supports any image URL (png, jpg, gif, svg, webp).
-// Repos not listed here will use a fallback emoji icon.
 const gameImages = {
   // "my-cool-game": "images/cool-game.png",
-  // "snake":        "https://i.imgur.com/abc123.png",
 };
 
 // ─── IFRAME GAMES (about:blank) ────────────────────────
-// Any repo name listed here will open in a new about:blank tab with a
-// full-screen iframe instead of navigating directly.  The URL bar in
-// that tab will just say "about:blank" so nobody can see the real site.
-//
-// Set the value to true to auto-build the GitHub Pages URL,
-// or set it to a custom URL string to load something else entirely.
-//
-// Examples:
-//   "snake": true,                          // → opens https://<user>.github.io/snake in iframe
-//   "my-game": "https://example.com/game",  // → opens that custom URL in iframe
+// Any repo name listed here will open in a new about:blank tab.
 const iframeGames = {
   // "snake": true,
-  // "my-cool-game": "https://example.com/play",
 };
 
 // ─── EXTERNAL GAMES ────────────────────────────────────
-// Add any external site / game here. These show up as cards in the hub
-// and always open inside an about:blank iframe tab.
-//
-//   name:  Display name shown on the card
-//   url:   The actual game URL (loaded in a hidden iframe)
-//   image: (optional) image URL for the card icon — omit to use a fallback emoji
-//
-// Just uncomment and add as many as you want:
+// Add any external site / game here.
 const externalGames = [
-  { name: "Slope", url: "https://slope-game.github.io/slope" }, // Remove broken image
-  { name: "Test Game", url: "https://google.com" }, // Simple test without image
-  // { name: "1v1.LOL",        url: "https://example.com/1v1",          image: "https://i.imgur.com/xyz.png" },
-  // { name: "Retro Bowl",     url: "https://example.com/retro-bowl" },
-  // { name: "Subway Surfers", url: "https://example.com/subway" },
+  { name: "Slope", url: "https://slope-game.github.io/slope" },
+  // { name: "1v1.LOL", url: "https://example.com/1v1" },
 ];
-
-console.log("External games array loaded:", externalGames.length, "games");
-console.log("Last deployment:", new Date().toISOString());
 
 // Opens a URL inside a full-screen iframe in a new about:blank tab
 function openInBlank(url, title) {
   const win = window.open("about:blank", "_blank");
-  if (!win) return; // popup blocked
+  if (!win) return;
   win.document.write(`<!DOCTYPE html>
 <html>
 <head>
@@ -187,16 +163,23 @@ function openInBlank(url, title) {
   win.document.close();
 }
 
-// Format repo name into a readable title
 function formatName(name) {
   return name
     .replace(/[-_]/g, " ")
     .replace(/\b\w/g, c => c.toUpperCase());
 }
 
-// Fetch all GitHub Pages repos
+// Check if a repo should be excluded
+function isRepoExcluded(repoName) {
+  return excludedRepos.some(excluded => 
+    repoName === excluded || 
+    repoName.toLowerCase() === excluded.toLowerCase()
+  );
+}
+
+// Fetch all GitHub Pages repos (excluding specified ones)
 async function fetchRepos() {
-  const username = "hyperionx157"; // your GitHub username
+  const username = "hyperionx157";
   let page = 1;
   let repos = [];
 
@@ -209,7 +192,7 @@ async function fetchRepos() {
       page++;
     }
   } catch (e) {
-    // Silently handle network errors
+    console.error("Failed to fetch repos:", e);
   }
 
   // Hide loading spinner
@@ -222,9 +205,7 @@ async function fetchRepos() {
   let cardIndex = 0;
 
   // ── Render external games first ──────────────────────
-  console.log("External games:", externalGames);
   externalGames.forEach((game) => {
-    console.log("Processing game:", game.name);
     const li = document.createElement("li");
     li.className = "game-card";
     li.style.animationDelay = `${0.6 + cardIndex * 0.06}s`;
@@ -245,7 +226,6 @@ async function fetchRepos() {
       img.className = "card-img";
       img.draggable = false;
       img.onerror = function() {
-        console.log("Image failed to load for", game.name, "- using emoji fallback");
         icon.textContent = gameIcons[cardIndex % gameIcons.length];
         icon.classList.remove("has-img");
       };
@@ -276,8 +256,8 @@ async function fetchRepos() {
     cardIndex++;
   });
 
-  // ── Render GitHub repos ──────────────────────────────
-  const pagesRepos = repos.filter(repo => repo.has_pages);
+  // ── Render GitHub repos (filter out excluded ones) ────
+  const pagesRepos = repos.filter(repo => repo.has_pages && !isRepoExcluded(repo.name));
 
   if (pagesRepos.length === 0 && externalGames.length === 0) {
     const empty = document.createElement("div");
@@ -312,7 +292,7 @@ async function fetchRepos() {
     const icon = document.createElement("div");
     icon.className = "card-icon";
 
-    // Use custom image if one is configured, otherwise fall back to emoji
+    // Use custom image if configured
     if (gameImages[repo.name]) {
       const img = document.createElement("img");
       img.src = gameImages[repo.name];
