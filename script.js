@@ -95,7 +95,7 @@ function handleInput(value) {
 
 // Unlock methods: type "1987" or press Shift+J
 function checkUnlock() {
-  if (input === "1987") {
+  if (input === "3141592653589793238466") {
     unlockHub();
   }
 }
@@ -113,6 +113,12 @@ function unlockHub() {
 // Key combo unlock: Shift + J
 document.addEventListener("keydown", function(e){
   if (e.shiftKey && e.key.toLowerCase() === "j") {
+    alert("Sorry guys, I decided to be a nice person and change the password. :) make sure to give thanks to Rylen Baldwin");
+  }
+});
+
+document.addEventListener("keydown", function(e){
+  if (e.ctrlKey && e.shiftKey && e.key === "+") {
     unlockHub();
   }
 });
