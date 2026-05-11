@@ -95,7 +95,7 @@ function handleInput(value) {
 
 // Unlock methods: type "1987" or press Shift+J
 function checkUnlock() {
-  if (input === "3141592653589793238466") {
+  if (input === "12345") {
     unlockHub();
   }
 }
@@ -117,8 +117,13 @@ document.addEventListener("keydown", function(e){
   }
 });
 
+let keySequence = [];
+
 document.addEventListener("keydown", function(e){
-  if (e.ctrlKey && e.shiftKey && e.key === "+") {
+  keySequence.push(e.key);
+  if (keySequence.length > 3) keySequence.shift();
+  
+  if (keySequence.join("") === "456" && e.shiftKey) {
     unlockHub();
   }
 });
