@@ -1,15 +1,10 @@
 // ─── EXCLUDED REPOSITORIES ──────────────────────────────────
-// Add any GitHub repo names here that you want to hide from the game hub.
-// These will NOT appear in the list, even if they have GitHub Pages enabled.
 const excludedRepos = [
-  "GameSite",        // hides https://hyperionx157.github.io/GameSite/
-  "GameSite-V2"      // hides https://hyperionx157.github.io/GameSite-V2/
-  // Add more repo names as needed, e.g., "my-private-repo", "test-game"
+  "GameSite",
+  "GameSite-V2"
 ];
 
 // ─── URL SCRAMBLE ──────────────────────────────────────
-// Replaces the visible URL in the address bar with a fake innocent path.
-// Change this to whatever you want people to see if they glance at your screen.
 const FAKE_TITLE = "Scientific Calculator - Math Tools";
 document.title = FAKE_TITLE;
 
@@ -17,13 +12,12 @@ let input = "";
 const display = document.getElementById("display");
 const buttonsContainer = document.getElementById("buttons");
 
-// Calculator buttons
 const buttons = [
   "7","8","9","/",
   "4","5","6","*",
   "1","2","3","-",
   "0",".","=","+",
-  "C","←" // ← is backspace
+  "C","←"
 ];
 
 const operators = ["/", "*", "-", "+"];
@@ -36,7 +30,6 @@ buttons.forEach((btn, i) => {
     handleInput(btn);
   };
 
-  // Apply style classes
   if (operators.includes(btn)) {
     button.classList.add("operator");
   } else if (btn === "=") {
@@ -45,20 +38,17 @@ buttons.forEach((btn, i) => {
     button.classList.add("action");
   }
 
-  // C button spans 2 columns
   if (btn === "C") {
     button.classList.add("wide");
   }
 
   buttonsContainer.appendChild(button);
 
-  // Staggered entrance animation
   requestAnimationFrame(() => {
     button.style.animation = `btnAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${0.3 + i * 0.03}s both`;
   });
 });
 
-// Ripple effect on button press
 function createRipple(event, button) {
   const ripple = document.createElement("span");
   ripple.classList.add("ripple");
@@ -78,7 +68,6 @@ function handleInput(value) {
     } catch (e) {
       input = "";
     }
-    // Flash display on result
     display.classList.add("active");
     setTimeout(() => display.classList.remove("active"), 300);
   } else if (value === "C") {
@@ -93,7 +82,7 @@ function handleInput(value) {
   checkUnlock();
 }
 
-// Unlock methods: type "1987" or press Shift+J
+// Unlock by typing 12345 on the calculator
 function checkUnlock() {
   if (input === "12345") {
     unlockHub();
@@ -110,21 +99,24 @@ function unlockHub() {
   }, 400);
 }
 
-// Key combo unlock: Shift + J
+// Shift+J: show message
 document.addEventListener("keydown", function(e){
   if (e.shiftKey && e.key.toLowerCase() === "j") {
     alert("Sorry guys, I decided to be a nice person and change the password. :) make sure to give thanks to Rylen Baldwin");
   }
 });
 
+// Shift+4,5,6 ($%^) sequence unlock
 let keySequence = [];
 
 document.addEventListener("keydown", function(e){
-  keySequence.push(e.key);
-  if (keySequence.length > 3) keySequence.shift();
-  
-  if (keySequence.join("") === "456" && e.shiftKey) {
-    unlockHub();
+  if (e.shiftKey) {
+    keySequence.push(e.key);
+    if (keySequence.length > 3) keySequence.shift();
+
+    if (keySequence.join("") === "$%^") {
+      unlockHub();
+    }
   }
 });
 
@@ -135,29 +127,24 @@ document.addEventListener("keydown", function(e){
   }
 });
 
-// Game icons to pick from for visual variety
+// ─── GAME ICONS ────────────────────────────────────────
 const gameIcons = ["🎮", "🕹️", "🎯", "🎲", "🏆", "⚡", "🔥", "💎", "🚀", "🌟", "🎪", "🃏"];
 
 // ─── CUSTOM GAME IMAGES ────────────────────────────────
-// Map repo names to image URLs to show a picture instead of an emoji.
 const gameImages = {
   // "my-cool-game": "images/cool-game.png",
 };
 
-// ─── IFRAME GAMES (about:blank) ────────────────────────
-// Any repo name listed here will open in a new about:blank tab.
+// ─── IFRAME GAMES ──────────────────────────────────────
 const iframeGames = {
   // "snake": true,
 };
 
 // ─── EXTERNAL GAMES ────────────────────────────────────
-// Add any external site / game here.
 const externalGames = [
   { name: "Slope", url: "https://slope-game.github.io/slope" },
-  // { name: "1v1.LOL", url: "https://example.com/1v1" },
 ];
 
-// Opens a URL inside a full-screen iframe in a new about:blank tab
 function openInBlank(url, title) {
   const win = window.open("about:blank", "_blank");
   if (!win) return;
@@ -180,15 +167,13 @@ function formatName(name) {
     .replace(/\b\w/g, c => c.toUpperCase());
 }
 
-// Check if a repo should be excluded
 function isRepoExcluded(repoName) {
-  return excludedRepos.some(excluded => 
-    repoName === excluded || 
+  return excludedRepos.some(excluded =>
+    repoName === excluded ||
     repoName.toLowerCase() === excluded.toLowerCase()
   );
 }
 
-// Fetch all GitHub Pages repos (excluding specified ones)
 async function fetchRepos() {
   const username = "hyperionx157";
   let page = 1;
@@ -206,7 +191,6 @@ async function fetchRepos() {
     console.error("Failed to fetch repos:", e);
   }
 
-  // Hide loading spinner
   const loading = document.getElementById("hubLoading");
   if (loading) loading.style.display = "none";
 
@@ -215,7 +199,6 @@ async function fetchRepos() {
 
   let cardIndex = 0;
 
-  // ── Render external games first ──────────────────────
   externalGames.forEach((game) => {
     const li = document.createElement("li");
     li.className = "game-card";
@@ -267,7 +250,6 @@ async function fetchRepos() {
     cardIndex++;
   });
 
-  // ── Render GitHub repos (filter out excluded ones) ────
   const pagesRepos = repos.filter(repo => repo.has_pages && !isRepoExcluded(repo.name));
 
   if (pagesRepos.length === 0 && externalGames.length === 0) {
@@ -289,7 +271,6 @@ async function fetchRepos() {
     link.target = "_blank";
     link.rel = "noopener noreferrer";
 
-    // If this game is in iframeGames, hijack the click to open in about:blank
     if (repo.name in iframeGames) {
       link.addEventListener("click", function(e) {
         e.preventDefault();
@@ -303,7 +284,6 @@ async function fetchRepos() {
     const icon = document.createElement("div");
     icon.className = "card-icon";
 
-    // Use custom image if configured
     if (gameImages[repo.name]) {
       const img = document.createElement("img");
       img.src = gameImages[repo.name];
